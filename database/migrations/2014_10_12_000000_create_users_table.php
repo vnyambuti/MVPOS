@@ -12,7 +12,7 @@ class CreateUsersTable extends Migration
      * @return void
      */
     // 'username',
-    //     'firstname',
+    //     'firstname',s
     //     'lastname',
     //     'phone',
     public function up()
@@ -27,7 +27,6 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('reset_code')->nullable()->default(null);
             $table->rememberToken();
             $table->timestamps();
         });

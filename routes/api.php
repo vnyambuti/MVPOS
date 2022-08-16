@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\RolesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +18,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/register', [ApiAuthController::class, 'Register']);
+Route::post('/login', [ApiAuthController::class, 'login']);
+Route::post('/reset', [ApiAuthController::class, 'reset']);
+Route::post('/password-changed', [ApiAuthController::class, 'resetpass']);
+Route::resources([
+    'roles'=>RolesController::class,
+    'permissions'=>PermissionsController::class
+]);
