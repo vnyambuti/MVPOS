@@ -79,7 +79,7 @@ class RolesController extends Controller
     public function show($id)
     {
         try {
-            $role = Role::findorFail($id);
+            $role = Role::where('id',$id)->with('permissions')->first();
             return response()->json(['success' => true, 'data' => ['role' => $role]]);
         } catch (\Exception $th) {
             $this->exceptionHandler($th);
@@ -94,7 +94,7 @@ class RolesController extends Controller
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**
@@ -106,7 +106,29 @@ class RolesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $rules = [
+                'title' => 'required',
+
+                'slug' => 'required',
+
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'error' =>  $validator->errors()]);
+            }
+
+
+            $role = Role::findorFail($id);
+            $role->title = $request->title;
+            $role->slug = $request->slug;
+            $role->save();
+            $role->permissions()->sync($request->permission);
+            return response()->json(['success' => true, 'message' => 'role ' . $role->title . ' updated']);
+        } catch (\Exception $th) {
+            return response()->json(['success' => false, 'error' => $th->getMessage()]);
+        }
     }
 
     /**

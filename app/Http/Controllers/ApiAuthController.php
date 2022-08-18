@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\PasswordChanged;
 use App\Mail\RestMail;
 use App\Models\User;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,55 +15,13 @@ use Illuminate\Support\Str;
 
 class ApiAuthController extends Controller
 {
+
+    use GeneralTrait;
     public function Register(Request $request)
     {
 
 
-        $rules = [
-
-            "firstname" => "required|unique:users",
-            "lastname" => "required|unique:users",
-            "phone" => ['required', 'regex:/^(?:254|0|\+254)?([0-9](?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$/', 'Unique:users'],
-            "email" => "required|unique:users",
-            "password" => "required|min:8",
-
-
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
-        }
-
-        $newuser = new User();
-
-        $newuser->firstname = $request->firstname;
-        $newuser->username = $request->firstname ;
-        $newuser->lastname = $request->lastname;
-        $newuser->phone = $request->phone;
-        $newuser->email = $request->email;
-        $newuser->password = Hash::make($request->password);
-
-        try{
-
-        $newuser->save();
-        // $accessToken = $newuser->createToken('authToken')->accessToken;
-            // $validated['password'] = bcrypt($request->password);
-
-            // $newuser = User::create($validated);
-            // $accessToken = $newuser->createToken('authToken')->accessToken;
-            // $newuser->reset_code = rand(100000, 999999);
-            // $newuser->reset_code_expires_at = now()->addMinutes(10);
-
-
-                // $newuser->save();
-                // Mail::to($newuser->email)->send(new EmailVerification($newuser, $newuser->email_code));
-                return response()->json(['success' => true, 'data' => ['user' => $newuser],'message'=>'Account Created'], 200);
-            } catch (\Exception $th) {
-                // dd($th);
-                return response()->json(['success' => false, 'error' => ['error' => $th->getMessage()]], 500);
-            }
-
+        return $this->newUser($request);
     }
 
     public function login(Request $request)
@@ -162,7 +121,4 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'error' => $th->getMessage()]);
         }
     }
-
-
-
 }

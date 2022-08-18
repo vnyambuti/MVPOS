@@ -3,6 +3,8 @@
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,5 +25,7 @@ Route::post('/reset', [ApiAuthController::class, 'reset']);
 Route::post('/password-changed', [ApiAuthController::class, 'resetpass']);
 Route::resources([
     'roles'=>RolesController::class,
-    'permissions'=>PermissionsController::class
+    'permissions'=>PermissionsController::class,
+    'users'=>UserController::class,
+    'shops'=>ShopController::class
 ]);
