@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiAuthController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\ShopController;
@@ -27,5 +28,6 @@ Route::resources([
     'roles'=>RolesController::class,
     'permissions'=>PermissionsController::class,
     'users'=>UserController::class,
-    'shops'=>ShopController::class
+    'shops'=>ShopController::class,
+    'categories'=>CategoriesController::class
 ]);

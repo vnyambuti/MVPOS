@@ -21,12 +21,12 @@ class Shop extends Model
 
     public function products()
     {
-        $this->hasMany(Products::class);
+      return  $this->hasMany(Products::class);
     }
 
     public function categories()
     {
-      $this->hasMany(Categories::class);
+      return $this->hasMany(Categories::class);
     }
 
 }

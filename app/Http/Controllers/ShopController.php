@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ShopResource;
 use App\Models\Shop;
 use App\Traits\GeneralTrait;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +22,7 @@ class ShopController extends Controller
     public function index()
     {
         try {
-            $shops = ShopResource::collection(Shop::all());
+            $shops = Shop::with('user')->with('categories')->limit(10)->OrderBy('created_at','desc')->get();
             return response()->json(['success' => true, 'data' => ['shops' => $shops]]);
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
@@ -66,7 +67,7 @@ class ShopController extends Controller
             $shop->email = $request->email;
             $shop->user_id = $request->user_id;
             $shop->save();
-            return response()->json(['success' => true, 'message' => 'Shop ' . $shop->name . ' Added', 'data' => ['shop' => $shop]]);
+            return response()->json(['success' => true, 'message' => 'Shop ' . $shop->name . ' Added', 'data' => ['shop' => $shop->with('user')->get()]]);
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
         }
@@ -80,7 +81,12 @@ class ShopController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+           $shop=Shop::where('id',$id)->with('user')->get();
+           return response()->json(['success'=>true,'data'=>['shop'=>$shop]]);
+        } catch (\Exception $th) {
+           return $this->exceptionHandler($th);
+        }
     }
 
     /**
@@ -103,7 +109,33 @@ class ShopController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $rules = [
+                "name" => "required",
+                "address" => "required",
+                "phone" => "required",
+                "email" => "required|email",
+                "logo" => "",
+                "user_id" => "required"
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
+            }
+            $shop=Shop::find($id);
+
+            $shop->update([
+              "name"=>$request->name,
+              "address"=>$request->address,
+              "phone"=>$request->phone,
+              "email"=>$request->email,
+              "logo"=>$request->logo,
+              "user_id"=>$request->user_id
+            ]);
+            return response()->json(['success'=>true,'message'=>'shop '.$shop->name." Updated",'data'=>['shop'=>$shop->with('user')->get()]]);
+        } catch (\Exception $th) {
+           return $this->exceptionHandler($th);
+        }
     }
 
     /**
@@ -114,6 +146,12 @@ class ShopController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+           $shop=Shop::findorFail($id);
+           $shop->delete();
+           return response()->json(['success'=>true,'message'=>'Shop '.$shop->name." deleted",'data'=>['shop'=>$shop]]);
+        } catch (\Exception $th) {
+          return $this->exceptionHandler($th);
+        }
     }
 }

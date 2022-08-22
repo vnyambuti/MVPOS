@@ -16,14 +16,14 @@ class Categories extends Model
 
     public function products()
     {
-       $this->hasMany(Products::class);
+       return $this->hasMany(Products::class);
     }
 
 
     public function shop()
     {
 
-        $this->belongsTo(Shop::class);
+       return $this->belongsTo(Shop::class);
 
     }
 
