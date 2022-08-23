@@ -10,13 +10,19 @@ class Products extends Model
     use HasFactory;
 
     protected $fillable=[
-        'c_id','name','price','count','low_stock','image','shop_id'
+        'categories_id','name','price','count','low_stock','image','shop_id'
     ];
 
 
     public function categories()
     {
-       $this->belongsTo(Categories::class);
+
+      return $this->belongsTo(Categories::class);
+    }
+
+    public function shop()
+    {
+       return $this->belongsTo(Shop::class);
     }
 
 

@@ -21,8 +21,8 @@ class CreateProductsTable extends Migration
             $table->string('count')->default('0');
             $table->string('low_stock')->default('0');
             $table->string('image')->nullable()->default('');
-            $table->unsignedBigInteger('c_id')->nullable();
-            $table->foreign('c_id')->references('id')->on('categories')->onDelete('set null')->onUpdate('cascade');
+            $table->unsignedBigInteger('categories_id')->nullable();
+            $table->foreign('categories_id')->references('id')->on('categories')->onDelete('set null')->onUpdate('cascade');
             $table->unsignedBigInteger('shop_id')->nullable();
             $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null')->onUpdate('cascade');
 

@@ -19,7 +19,7 @@ class CategoriesController extends Controller
     public function index()
     {
         try {
-           $categories=Categories::with('shop')->limit(20)->OrderBy('created_at','desc')->get();
+           $categories=Categories::with('shop')->with('products')->limit(20)->OrderBy('created_at','desc')->get();
            return response()->json(['success'=>true,'data'=>['categories'=>$categories]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
@@ -59,7 +59,7 @@ class CategoriesController extends Controller
             $category->image=$request->image;
             $category->shop_id=$request->shop_id;
             $category->save();
-            return response()->json(['success'=>true,'mesasge'=>"category ".$category->name." Added",'data'=>['category'=>$category->with('shop')->get()]]);
+            return response()->json(['success'=>true,'mesasge'=>"category ".$category->name." Added",'data'=>['category'=>$category->with('shop')->limit(5)->OrderBy('created_at','DESC')->get()]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
         }

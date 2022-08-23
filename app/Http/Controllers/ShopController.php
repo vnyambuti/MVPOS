@@ -22,7 +22,7 @@ class ShopController extends Controller
     public function index()
     {
         try {
-            $shops = Shop::with('user')->with('categories')->limit(10)->OrderBy('created_at','desc')->get();
+            $shops = Shop::with('user')->with('categories')->with('products')->limit(10)->OrderBy('created_at','desc')->get();
             return response()->json(['success' => true, 'data' => ['shops' => $shops]]);
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
@@ -82,7 +82,7 @@ class ShopController extends Controller
     public function show($id)
     {
         try {
-           $shop=Shop::where('id',$id)->with('user')->get();
+           $shop=Shop::where('id',$id)->with('user')->with('categories')->with('products')->first();
            return response()->json(['success'=>true,'data'=>['shop'=>$shop]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
