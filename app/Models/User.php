@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
        return $this->hasMany(Shop::class);
     }
+
+    public function teller()
+    {
+       return $this->hasOne(Teller::class);
+    }
 }

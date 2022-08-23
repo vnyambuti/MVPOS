@@ -27,7 +27,7 @@ trait GeneralTrait
             "lastname" => "required|unique:users",
             "phone" => ['required', 'regex:/^(?:254|0|\+254)?([0-9](?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$/', 'Unique:users'],
             "email" => "required|unique:users",
-            "password" => "required|min:8",
+            "password" => "",
 
 
         ];
@@ -61,12 +61,35 @@ trait GeneralTrait
 
                 // $newuser->save();
                 // Mail::to($newuser->email)->send(new EmailVerification($newuser, $newuser->email_code));
-                return response()->json(['success' => true, 'data' => ['user' => new UserResource(User::find($newuser->id))],'message'=>'Account Created'], 200);
+                return $newuser;
             } catch (\Exception $th) {
                 // dd($th);
                 return response()->json(['success' => false, 'error' => ['error' => $th->getMessage()]], 500);
             }
 
+    }
+
+
+    public function updateUser($request,$id)
+    {
+        $rules = [
+            "firstname" => "required",
+            "lastname" => "required",
+            "phone" => ['required', 'regex:/^(?:254|0|\+254)?([0-9](?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$/'],
+            "email" => "required",
+            "password" => ""
+
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
+        }
+
+        $user = User::findorFail($id);
+        $user->update(['firstname' => $request->firstname, 'lastname' => $request->lastname, 'phone' => $request->phone, 'email' => $request->email, Hash::make($request->password)]);
+        $user->roles()->sync($request->role);
+        return $user;
     }
 
 }

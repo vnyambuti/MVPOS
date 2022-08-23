@@ -16,8 +16,8 @@ class CreateTellersTable extends Migration
     {
         Schema::create('tellers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('u_id');
-            $table->foreign('u_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('shop_id')->nullable();
             $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null')->onUpdate('cascade');
             $table->string('status')->default('Inactive')->nullable();

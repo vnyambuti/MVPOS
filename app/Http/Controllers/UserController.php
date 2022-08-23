@@ -48,7 +48,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            return  $this->newUser($request);
+            $newuser= $this->newUser($request);
+
+            return response()->json(['success'=>true,'message'=>'Account Created','data'=>['user'=>$newuser]]);
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
         }
@@ -90,24 +92,9 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $rules = [
-                "firstname" => "required",
-                "lastname" => "required",
-                "phone" => ['required', 'regex:/^(?:254|0|\+254)?([0-9](?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$/'],
-                "email" => "required",
-                "password" => "required|min:8"
+             $user=$this->updateUser($request,$id);
 
-            ];
-
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
-            }
-
-            $user = User::findorFail($id);
-            $user->update(['firstname' => $request->firstname, 'lastname' => $request->lastname, 'phone' => $request->phone, 'email' => $request->email, Hash::make($request->password)]);
-            $user->roles()->sync($request->role);
-            return response()->json(['success' => true, 'message' => 'user ' . $user->username . 'Edited', 'data' => ['user' => $user]]);
+            return response()->json(['success' => true, 'message' => 'user ' . $user->username . ' Edited', 'data' => ['user' => $user]]);
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
         }

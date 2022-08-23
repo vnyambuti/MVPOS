@@ -6,6 +6,7 @@ use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\TellerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,5 +32,6 @@ Route::resources([
     'users'=>UserController::class,
     'shops'=>ShopController::class,
     'categories'=>CategoriesController::class,
-    'products'=>ProductController::class
+    'products'=>ProductController::class,
+    'tellers'=>TellerController::class
 ]);

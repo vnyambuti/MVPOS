@@ -10,17 +10,17 @@ class Teller extends Model
     use HasFactory;
 
     protected $fillable=[
-        'u_id','shop_id','status'
+        'user_id','shop_id','status'
 
     ];
 
     public function shop()
     {
-       $this->belongsTo(Shop::class);
+       return $this->belongsTo(Shop::class);
     }
 
     public function user()
     {
-       $this->belongsTo(User::class);
+      return  $this->belongsTo(User::class);
     }
 }

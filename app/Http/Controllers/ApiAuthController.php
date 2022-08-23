@@ -21,7 +21,8 @@ class ApiAuthController extends Controller
     {
 
 
-        return $this->newUser($request);
+        $newuser = $this->newUser($request);
+        return response()->json(['success' => true, 'message' => 'User Registerd', 'data' => ['user' => $newuser]]);
     }
 
     public function login(Request $request)
