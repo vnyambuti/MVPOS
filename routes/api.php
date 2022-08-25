@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RolesController;
@@ -26,6 +27,7 @@ Route::post('/register', [ApiAuthController::class, 'Register']);
 Route::post('/login', [ApiAuthController::class, 'login']);
 Route::post('/reset', [ApiAuthController::class, 'reset']);
 Route::post('/password-changed', [ApiAuthController::class, 'resetpass']);
+Route::middleware('auth:api')->group( function () {
 Route::resources([
     'roles'=>RolesController::class,
     'permissions'=>PermissionsController::class,
@@ -35,3 +37,5 @@ Route::resources([
     'products'=>ProductController::class,
     'tellers'=>TellerController::class
 ]);
+Route::post('/add', [OrderController::class, 'add']);
+});
