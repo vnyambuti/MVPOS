@@ -10,16 +10,16 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable=[
-       'products','total','status','shop_id','teller_id'
+       'products','total','status','mode','shop_id','teller_id'
     ];
 
     public function shop()
     {
-       $this->belongsTo(Shop::class);
+      return $this->belongsTo(Shop::class);
     }
 
     public function teller()
     {
-        $this->belongsTo(Teller::class);
+       return $this->belongsTo(Teller::class);
     }
 }

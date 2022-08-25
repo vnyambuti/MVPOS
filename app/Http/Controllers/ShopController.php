@@ -49,10 +49,10 @@ class ShopController extends Controller
         // 'name','address','phone','email','logo','user_id'
         try {
             $rules = [
-                "name" => "required",
+                "name" => "required|unique:shops",
                 "address" => "required",
-                "phone" => "required",
-                "email" => "required|email",
+                "phone" => "required|unique:shops",
+                "email" => "required|email|unique:shops",
                 "logo" => "",
                 "user_id" => "required"
             ];
@@ -67,7 +67,7 @@ class ShopController extends Controller
             $shop->email = $request->email;
             $shop->user_id = $request->user_id;
             $shop->save();
-            return response()->json(['success' => true, 'message' => 'Shop ' . $shop->name . ' Added', 'data' => ['shop' => $shop->with('user')->get()]]);
+            return response()->json(['success' => true, 'message' => 'Shop ' . $shop->name . ' Added', 'data' => ['shop' => $shop]]);
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
         }

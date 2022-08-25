@@ -35,7 +35,10 @@ Route::resources([
     'shops'=>ShopController::class,
     'categories'=>CategoriesController::class,
     'products'=>ProductController::class,
-    'tellers'=>TellerController::class
+    'tellers'=>TellerController::class,
+    'orders'=>OrderController::class
 ]);
 Route::post('/add', [OrderController::class, 'add']);
+Route::post('/remove', [OrderController::class, 'remove']);
+Route::post('/clear', [OrderController::class, 'clear']);
 });

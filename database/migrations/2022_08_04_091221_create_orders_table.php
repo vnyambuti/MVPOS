@@ -19,6 +19,7 @@ class CreateOrdersTable extends Migration
             $table->json('products');
             $table->float('total');
             $table->string('status')->default('processing');
+            $table->string('mode')->default('cash');
             $table->unsignedBigInteger('shop_id')->nullable();
             $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null')->onUpdate('cascade');
             $table->unsignedBigInteger('teller_id')->nullable();
