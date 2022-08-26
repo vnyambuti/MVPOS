@@ -70,7 +70,8 @@ class OrderController extends Controller
                 $product->update([
                     'count' => $newstock,
                 ]);
-             $total=$total+$value['price'];
+                $newtot=$value['price'] * $value['quantity'];
+             $total=$total+$newtot;
            }
            $neworder=new Order();
            $neworder->products=serialize($order);
@@ -141,6 +142,7 @@ class OrderController extends Controller
     public function add(Request $request)
     {
         try {
+
             $rules = [
 
                 "product_id" => "required",
@@ -152,6 +154,9 @@ class OrderController extends Controller
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
             }
+            //   $shop=;
+
+           if (Products::find($request->product_id)->shop_id == Auth::user()->teller->shop_id ) {
             $product = Products::findorFail($request->product_id);
             $id = $request->product_id;
             $cart = Session::get('cart');
@@ -179,6 +184,7 @@ class OrderController extends Controller
             // if cart not empty then check if this product exist then increment quantity
             if (isset($cart[$id])) {
                 $cart[$id]['quantity'] =$cart[$id]['quantity'] + $request->quantity;
+
                 $request->session()->put('cart', $cart);
                 // $newstock = (int)$product->count - $request->quantity;
                 // $product->update([
@@ -192,7 +198,7 @@ class OrderController extends Controller
                 "product_id"=>$id,
                 "name" => $product->name,
                 "quantity" => $request->quantity,
-                "price" => $product->price,
+                "price" => $product->price ,
                 "photo" => $product->photo
             ];
             $request->session()->put('cart', $cart);
@@ -202,6 +208,8 @@ class OrderController extends Controller
             // ]);
 
             return response()->json(['success' => true, 'message' => 'Product added to cart successfully!', 'data' => ['sale' => $cart]]);
+           }
+
         } catch (\Exception $th) {
             return $this->exceptionHandler($th);
         }

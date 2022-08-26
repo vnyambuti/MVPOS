@@ -46,7 +46,7 @@ class ProductController extends Controller
       try {
         $rules = [
             "categories_id" => "required",
-            "name" => "required",
+            "name" => "required|unique:products",
             "price" => "required",
             "count" => "required|gt:0",
             "image" => "",

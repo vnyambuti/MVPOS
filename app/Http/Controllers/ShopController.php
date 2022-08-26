@@ -82,7 +82,7 @@ class ShopController extends Controller
     public function show($id)
     {
         try {
-           $shop=Shop::where('id',$id)->with('user')->with('categories')->with('products')->first();
+           $shop=Shop::where('id',$id)->with('user')->with('categories')->with('products')->with('tellers')->with('orders')->first();
            return response()->json(['success'=>true,'data'=>['shop'=>$shop]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);

@@ -29,4 +29,14 @@ class Shop extends Model
       return $this->hasMany(Categories::class);
     }
 
+    public function tellers()
+    {
+      return $this->hasMany(Teller::class);
+    }
+
+    public function orders()
+    {
+       return $this->hasMany(order::class);
+    }
+
 }

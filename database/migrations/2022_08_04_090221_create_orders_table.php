@@ -16,14 +16,14 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->json('products');
+            $table->text('products');
             $table->float('total');
             $table->string('status')->default('processing');
             $table->string('mode')->default('cash');
             $table->unsignedBigInteger('shop_id')->nullable();
-            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null')->onUpdate('set null');
             $table->unsignedBigInteger('teller_id')->nullable();
-            $table->foreign('teller_id')->references('id')->on('tellers')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('teller_id')->references('id')->on('tellers')->onDelete('set null')->onUpdate('set null');
             $table->timestamps();
         });
     }
