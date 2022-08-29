@@ -39,4 +39,9 @@ class Shop extends Model
        return $this->hasMany(order::class);
     }
 
+    public function popular()
+    {
+        return $this->hasMany(Popular::class);
+    }
+
 }

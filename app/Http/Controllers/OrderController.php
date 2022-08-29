@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Popular;
 use App\Models\Products;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
@@ -72,6 +73,20 @@ class OrderController extends Controller
                 ]);
                 $newtot=$value['price'] * $value['quantity'];
              $total=$total+$newtot;
+             //increase popularity of product
+             $popupar_product=Popular::where('product_id',$product->id)->first();
+             if ($popupar_product) {
+                $new_count=$popupar_product->count + 1;
+                $popupar_product->update([
+                    'count'=>$new_count
+                ]);
+             }else {
+                Popular::create([
+                   'shop_id'=>$product->shop_id,
+                   "product_id"=>$product->id,
+                   "count"=>1
+                ]);
+             }
            }
            $neworder=new Order();
            $neworder->products=serialize($order);

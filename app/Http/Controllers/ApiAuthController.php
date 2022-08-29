@@ -47,7 +47,11 @@ class ApiAuthController extends Controller
                     return response()->json(['success' => false, 'error' => 'user not found']);
                 } else {
                     // dd($user->roles);
-
+                     $user=User::where('id',$user->id)->with([
+                      'shops.popular',
+                      'shops',
+                      'tellers'
+                     ])->get();
                     $token = $user->createToken(rand(9999, 10000))->accessToken;
 
                     //  dd($newperm);
