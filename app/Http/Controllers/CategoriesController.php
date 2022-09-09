@@ -59,7 +59,7 @@ class CategoriesController extends Controller
             $category->image=$request->image;
             $category->shop_id=$request->shop_id;
             $category->save();
-            return response()->json(['success'=>true,'mesasge'=>"category ".$category->name." Added",'data'=>['category'=>$category->with('shop')->limit(5)->OrderBy('created_at','DESC')->get()]]);
+            return response()->json(['success'=>true,'mesasge'=>"category ".$category->name." Added",'data'=>['category'=>$category]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
         }
@@ -74,7 +74,10 @@ class CategoriesController extends Controller
     public function show($id)
     {
         try {
-            $category=Categories::where('id',$id)->with('shop')->first();
+            $category=Categories::where('id',$id)->with([
+                'shop',
+                'shop.products'
+            ])->first();
             return response()->json(['success'=>true,'data'=>['category'=>$category]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);

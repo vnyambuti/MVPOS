@@ -18,7 +18,7 @@ class ProductController extends Controller
     public function index()
     {
         try {
-           $products=Products::with('categories')->OrderBy('created_at','DESC')->limit(25)->get();
+           $products=Products::with('colours')->OrderBy('created_at','DESC')->limit(25)->get();
            return response()->json(['success'=>true,'data'=>['data'=>$products]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
@@ -51,7 +51,8 @@ class ProductController extends Controller
             "count" => "required|gt:0",
             "image" => "",
             "shop_id" => "required",
-            "low_stock" => ""
+            "low_stock" => "",
+
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -65,8 +66,10 @@ class ProductController extends Controller
         $product->image=$request->image;
         $product->shop_id=$request->shop_id;
         $product->low_stock=$request->low_stock;
+
         $product->save();
-        return response()->json(['success'=>true,'message'=>'product '.$product->name." Added",'data'=>['product'=>$product->with('categories')->limit(5)->OrderBy('created_at','DESC')->get()]]);
+        $product->colours()->sync($request->colors, []);
+        return response()->json(['success'=>true,'message'=>'product '.$product->name." Added",'data'=>['product'=>$product]]);
       } catch (\Exception $th) {
         return $this->exceptionHandler($th);
       }
@@ -83,7 +86,12 @@ class ProductController extends Controller
     {
         try {
 
-          return response()->json(['success'=>true,'data'=>['product'=>Products::where('id',$id)->with('categories')->with('shop')->first()]]);
+          return response()->json(['success'=>true,'data'=>['product'=>Products::where('id',$id)->with([
+            'shop',
+            'categories',
+            'categories.products.colours',
+
+            ])->first()]]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
         }
@@ -117,7 +125,8 @@ class ProductController extends Controller
                 "count" => "required|gt:0",
                 "image" => "",
                 "shop_id" => "required",
-                "low_stock" => ""
+                "low_stock" => "",
+
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -131,9 +140,16 @@ class ProductController extends Controller
                 "count" => $request->count,
                 "image" => $request->image,
                 "shop_id" => $request->shop_id,
-                "low_stock" => $request->low_stock
+                "low_stock" => $request->low_stock,
+                "colour_id"=>$request->colour_id
+
             ]);
-            return response()->json(['success'=>true,'message'=>$product->name ." Updated",'data'=>['product'=>Products::where('id',$id)->with('categories')->with('shop')->first()]]);
+            $product->colours()->sync($request->colors,);
+            return response()->json(['success'=>true,'message'=>$product->name ." Updated",'data'=>['product'=>Products::where('id',$id)->with([
+                'shop',
+                'categories',
+                'categories.products.colours',
+                ])->first()]]);
         } catch (\Exception $th) {
           return $this->exceptionHandler($th);
         }

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -47,15 +48,14 @@ class ApiAuthController extends Controller
                     return response()->json(['success' => false, 'error' => 'user not found']);
                 } else {
                     // dd($user->roles);
-                     $user=User::where('id',$user->id)->with([
-                      'shops.popular',
-                      'shops',
-                      'tellers'
-                     ])->get();
-                    $token = $user->createToken(rand(9999, 10000))->accessToken;
 
+                    $token = $user->createToken(rand(9999, 10000))->accessToken;
+                    $user=User::where('id',$user->id)->with([
+                        'teller.shop.categories'
+                       ])->first();
                     //  dd($newperm);
-                    return response()->json(['success' => true, 'data' => ['user' => $user, 'token' => $token]], 200);
+                    $sale=Session::get('cart');
+                    return response()->json(['success' => true, 'user' => $user, 'token' => $token,'sale'=>$sale], 200);
                 }
             } else {
                 return response()->json(['success' => false, 'error' => 'Invalid credentials']);
@@ -89,6 +89,37 @@ class ApiAuthController extends Controller
                 //    dd($user);
                 Mail::to($user->email)->send(new RestMail($user));
                 return response()->json(['success' => true, 'message' => 'reset code has been mailed successfully'], 200);
+            }
+        } catch (\Exception $th) {
+            return response()->json(['success' => false, 'error' => $th->getMessage()]);
+        }
+    }
+
+    public function resetcode(Request $request)
+    {
+        try {
+            $rules = [
+                'code' => 'required',
+
+
+
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'error' =>  $validator->errors()]);
+            }
+
+            $user = User::where('reset_code', $request->code)->first();
+            if (!$user) {
+                return response()->json(['success' => false, 'error' => 'invalid code,kindly request for a new one']);
+            } else {
+
+
+
+
+
+                return response()->json(['success' => true, 'message' => 'code verified','code'=>$request->code], 200);
             }
         } catch (\Exception $th) {
             return response()->json(['success' => false, 'error' => $th->getMessage()]);

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiAuthController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ColourController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ProductController;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [ApiAuthController::class, 'Register']);
 Route::post('/login', [ApiAuthController::class, 'login']);
 Route::post('/reset', [ApiAuthController::class, 'reset']);
+Route::post('/resetcode', [ApiAuthController::class, 'resetcode']);
 Route::post('/password-changed', [ApiAuthController::class, 'resetpass']);
 Route::middleware('auth:api')->group( function () {
 Route::resources([
@@ -36,7 +38,8 @@ Route::resources([
     'categories'=>CategoriesController::class,
     'products'=>ProductController::class,
     'tellers'=>TellerController::class,
-    'orders'=>OrderController::class
+    'orders'=>OrderController::class,
+    'color'=>ColourController::class
 ]);
 Route::post('/add', [OrderController::class, 'add']);
 Route::post('/remove', [OrderController::class, 'remove']);
