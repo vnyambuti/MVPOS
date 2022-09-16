@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Popular;
 use App\Models\Products;
+use App\Models\Shop;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -18,10 +22,10 @@ class ProductController extends Controller
     public function index()
     {
         try {
-           $products=Products::with('colours')->OrderBy('created_at','DESC')->limit(25)->get();
-           return response()->json(['success'=>true,'data'=>['data'=>$products]]);
+            $products = Products::with('colours')->OrderBy('created_at', 'DESC')->limit(25)->get();
+            return response()->json(['success' => true, 'data' => ['data' => $products]]);
         } catch (\Exception $th) {
-           return $this->exceptionHandler($th);
+            return $this->exceptionHandler($th);
         }
     }
 
@@ -43,37 +47,41 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-      try {
-        $rules = [
-            "categories_id" => "required",
-            "name" => "required|unique:products",
-            "price" => "required",
-            "count" => "required|gt:0",
-            "image" => "",
-            "shop_id" => "required",
-            "low_stock" => "",
+        try {
+            $rules = [
+                "categories_id" => "required",
+                "name" => "required|unique:products",
+                "price" => "required",
+                "count" => "required|gt:0",
+                "image" => "required",
+                "shop_id" => "required",
+                "low_stock" => "",
 
-        ];
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
+            }
+
+            $product = new Products();
+            $product->categories_id = $request->categories_id;
+            $product->name = $request->name;
+            $product->price = $request->price;
+            $product->count = $request->count;
+            $product->image = $request->image;
+            $product->shop_id = $request->shop_id;
+            $product->low_stock = $request->low_stock;
+            $basename = Str::random();
+            $profile = $request->file('image');
+            $profilename = $basename . '.' . $profile->getClientOriginalExtension();
+            $profile->move(public_path('/products'),  $profilename);
+            $product->image = $request->root() . '/products/' . $profilename;
+            $product->save();
+            $product->colours()->sync($request->colors, []);
+            return response()->json(['success' => true, 'message' => 'product ' . $product->name . " Added", 'data' => ['product' => $product]]);
+        } catch (\Exception $th) {
+            return $this->exceptionHandler($th);
         }
-        $product=new Products();
-        $product->categories_id=$request->categories_id;
-        $product->name=$request->name;
-        $product->price=$request->price;
-        $product->count=$request->count;
-        $product->image=$request->image;
-        $product->shop_id=$request->shop_id;
-        $product->low_stock=$request->low_stock;
-
-        $product->save();
-        $product->colours()->sync($request->colors, []);
-        return response()->json(['success'=>true,'message'=>'product '.$product->name." Added",'data'=>['product'=>$product]]);
-      } catch (\Exception $th) {
-        return $this->exceptionHandler($th);
-      }
-
     }
 
     /**
@@ -86,14 +94,14 @@ class ProductController extends Controller
     {
         try {
 
-          return response()->json(['success'=>true,'data'=>['product'=>Products::where('id',$id)->with([
-            'shop',
-            'categories',
-            'categories.products.colours',
+            return response()->json(['success' => true, 'data' => ['product' => Products::where('id', $id)->with([
+                'shop',
+                'categories',
+                'categories.products.colours',
 
             ])->first()]]);
         } catch (\Exception $th) {
-           return $this->exceptionHandler($th);
+            return $this->exceptionHandler($th);
         }
     }
 
@@ -132,7 +140,7 @@ class ProductController extends Controller
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
             }
-            $product=Products::findorFail($id);
+            $product = Products::findorFail($id);
             $product->update([
                 "categories_id" => $request->categories_id,
                 "name" => $request->name,
@@ -141,17 +149,17 @@ class ProductController extends Controller
                 "image" => $request->image,
                 "shop_id" => $request->shop_id,
                 "low_stock" => $request->low_stock,
-                "colour_id"=>$request->colour_id
+                "colour_id" => $request->colour_id
 
             ]);
             $product->colours()->sync($request->colors,);
-            return response()->json(['success'=>true,'message'=>$product->name ." Updated",'data'=>['product'=>Products::where('id',$id)->with([
+            return response()->json(['success' => true, 'message' => $product->name . " Updated", 'data' => ['product' => Products::where('id', $id)->with([
                 'shop',
                 'categories',
                 'categories.products.colours',
-                ])->first()]]);
+            ])->first()]]);
         } catch (\Exception $th) {
-          return $this->exceptionHandler($th);
+            return $this->exceptionHandler($th);
         }
     }
 
@@ -164,11 +172,37 @@ class ProductController extends Controller
     public function destroy($id)
     {
         try {
-           $product=Products::findorFail($id);
-           $product->delete();
-           return response()->json(['success'=>true,'message'=>$product->name. " Deleted ",'data'=>['product'=>$product]]);
+            $product = Products::findorFail($id);
+            $product->delete();
+            return response()->json(['success' => true, 'message' => $product->name . " Deleted ", 'data' => ['product' => $product]]);
+        } catch (\Exception $th) {
+            return $this->exceptionHandler($th);
+        }
+    }
+
+    public function getPopularProducts(Request $request)
+    {
+        try {
+           $products=Popular::where('shop_id',$request->shop_id)->with([
+            'product',
+            'product.colours'
+           ])->OrderBy('count','DESC')->limit(4)->get();
+           return response()->json(['success' => true, 'popular' => $products]);
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
         }
+    }
+
+    public function productsByShop(Request $request)
+    {
+        try {
+            $products=Shop::where('id',$request->shop_id)->with([
+             'categories',
+             'categories.products.colours'
+            ])->get();
+            return response()->json(['success' => true, 'products' => $products]);
+         } catch (\Exception $th) {
+            return $this->exceptionHandler($th);
+         }
     }
 }

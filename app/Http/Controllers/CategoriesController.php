@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use App\Models\Products;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -143,5 +144,27 @@ class CategoriesController extends Controller
         } catch (\Exception $th) {
            return $this->exceptionHandler($th);
         }
+    }
+
+    public function productsByCategory(Request $request)
+    {
+      try {
+        $rules = [
+
+            "category_id" => "required"
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'error' =>  $validator->errors()], 422);
+        }
+
+
+        $products=Categories::where('id',$request->category_id)->with([
+            'products.colours'
+        ])->get();
+        return response()->json(['success'=>true,'products'=>$products]);
+      } catch (\Exception $th) {
+        return $this->exceptionHandler($th);
+      }
     }
 }

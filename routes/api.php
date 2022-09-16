@@ -44,4 +44,6 @@ Route::resources([
 Route::post('/add', [OrderController::class, 'add']);
 Route::post('/remove', [OrderController::class, 'remove']);
 Route::post('/clear', [OrderController::class, 'clear']);
-});
+Route::post('/popular-products', [ProductController::class, 'getPopularProducts']);
+Route::post('/shop-products', [ProductController::class, 'productsByShop']);
+Route::post('/category-products', [CategoriesController::class, 'productsByCategory']);});
